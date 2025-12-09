@@ -1,65 +1,220 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { formatIDR, products } from "./lib/products";
+
+const featured = products.slice(0, 4);
 
 export default function Home() {
+  const categories = useMemo(
+    () => ["Semua", ...Array.from(new Set(products.map((p) => p.category)))],
+    []
+  );
+  const [selected, setSelected] = useState("Semua");
+
+  const filtered = useMemo(
+    () =>
+      selected === "Semua"
+        ? products
+        : products.filter((p) => p.category === selected),
+    [selected]
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="space-y-10 text-white">
+      <section className="card relative overflow-hidden border-white/10 bg-linear-to-br from-[#10213c] via-[#0f1f38] to-[#0d1b2a] px-6 py-10 text-white">
+        <div className="absolute right-10 top-10 h-32 w-32 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-sky-400/10 blur-3xl" />
+        <div className="relative grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-4">
+            <p className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-100">
+              Marketplace Sewa
+            </p>
+            <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+              Sewa barang premium dengan pengalaman elegan dan minimalis.
+            </h1>
+            <p className="text-lg text-slate-200">
+              Toserba Rent menghadirkan kurasi kamera, audio, fashion, hingga
+              outdoor gear dengan status ketersediaan real-time.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/cart" className="btn btn-primary">
+                Lihat Keranjang
+              </Link>
+              <Link href="/messages" className="btn btn-ghost">
+                Hubungi Penyewa
+              </Link>
+              <Link
+                href="/provider"
+                className="btn btn-ghost border border-white/20"
+              >
+                Daftar Penyedia
+              </Link>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-slate-200 sm:grid-cols-4">
+              {[
+                { label: "Barang tersedia", value: "120+" },
+                { label: "Penyewaan selesai", value: "5.3K" },
+                { label: "Waktu respon", value: "< 5 menit" },
+                { label: "Proteksi", value: "Asuransi kerusakan" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+                >
+                  <p className="text-xs text-slate-300">{item.label}</p>
+                  <p className="text-lg font-semibold text-white">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card border-white/10 bg-white/10 p-6 text-slate-100">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">Status Sewa</p>
+              <span className="pill bg-emerald-100 text-emerald-700">
+                Siap kirim
+              </span>
+            </div>
+            <div className="mt-6 space-y-3">
+              {featured.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3"
+                >
+                  <div
+                    className="h-14 w-14 rounded-xl"
+                    style={{ background: product.imageColor }}
+                  />
+                  <div className="flex-1 text-sm">
+                    <p className="font-semibold text-white">{product.name}</p>
+                    <p className="text-slate-300">{product.category}</p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <p className="font-semibold text-white">
+                      {formatIDR(product.pricePerDay)}/hari
+                    </p>
+                    <p
+                      className={`pill ${
+                        product.status === "ready"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}
+                    >
+                      {product.status === "ready" ? "Siap" : "Disewakan"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="space-y-2 text-white">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm uppercase tracking-[0.18em] text-sky-100">
+                Koleksi unggulan
+              </p>
+              <h2 className="text-2xl font-bold">Dashboard Marketplace</h2>
+            </div>
+            <div className="flex gap-2">
+              <span className="pill bg-emerald-100 text-emerald-700">
+                Ready: hijau
+              </span>
+              <span className="pill bg-amber-100 text-amber-800">
+                Disewakan: kuning
+              </span>
+            </div>
+          </div>
+          <p className="text-slate-200">
+            Cek status barang siap sewa atau sedang dipinjam.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelected(cat)}
+              className={`pill border ${
+                selected === cat
+                  ? "border-sky-200 bg-white/20 text-white"
+                  : "border-white/20 bg-white/10 text-slate-200 hover:bg-white/20"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-      </main>
+
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((product) => (
+            <Link
+              href={`/products/${product.id}`}
+              key={product.id}
+              className="card group flex h-full flex-col overflow-hidden border-white/10 bg-white/90 transition hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <div
+                className="h-40 w-full"
+                style={{ background: product.imageColor }}
+              />
+              <div className="flex flex-1 flex-col gap-3 p-4">
+                <div className="flex items-center justify-between">
+                  <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    {product.category}
+                  </p>
+                  <span
+                    className={`pill ${
+                      product.status === "ready"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-amber-100 text-amber-800"
+                    }`}
+                  >
+                    {product.status === "ready" ? "Siap" : "Disewakan"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-slate-600 line-clamp-2">
+                  {product.description}
+                </p>
+                <div className="mt-auto flex items-center justify-between text-sm font-semibold text-slate-900">
+                  <span>{formatIDR(product.pricePerDay)}/hari</span>
+                  <span className="text-slate-500">{product.location}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="card border-white/10 bg-white/10 p-6 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.18em] text-sky-100">
+              Chat langsung
+            </p>
+            <h3 className="text-xl font-bold">Butuh bantuan? Mulai obrolan</h3>
+            <p className="text-slate-200">
+              Tim kami siap menjawab pertanyaan soal ketersediaan, harga, atau
+              permintaan khusus.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/messages" className="btn btn-primary">
+              Buka Pesan
+            </Link>
+            <Link href="/login" className="btn btn-ghost border border-white/20">
+              Login untuk menyewa
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
